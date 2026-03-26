@@ -21,6 +21,16 @@ export default function HomePage() {
     encodeShareUrl, getTotalStats,
   } = useGearsetStore();
 
+  // Load shared gearset from URL query param on mount
+  const loadFromCode = useGearsetStore(s => s.loadFromCode);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareCode = params.get('s');
+    if (shareCode) {
+      loadFromCode(shareCode);
+    }
+  }, [loadFromCode]);
+
   // Load data when job changes
   useEffect(() => {
     if (!job) return;

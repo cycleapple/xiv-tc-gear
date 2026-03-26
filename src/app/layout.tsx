@@ -19,7 +19,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <style>{`
-          .header-link:hover { border-color: var(--accent) !important; }
+          .header-link:hover { opacity: 0.85; transform: translateY(-1px); }
         `}</style>
       </head>
       <body className="min-h-screen antialiased">
@@ -37,21 +37,50 @@ export default function RootLayout({
           >
             XIV 繁中配裝
           </a>
-          <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-            <span>FFXIV 配裝規劃與分享</span>
+          <div className="flex items-center gap-3 text-xs">
             <a
-              href="https://github.com/cycleapple/xiv-tc-toolbox"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="header-link px-2 py-1"
+              href="https://cycleapple.github.io/xiv-tc-toolbox/"
+              className="header-link px-3 py-1.5"
               style={{
                 borderRadius: 'var(--radius-btn)',
                 border: '1px solid var(--border)',
-                color: 'var(--text-secondary)',
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--bg-card)',
+                fontWeight: 500,
                 transition: 'all 0.2s ease',
               }}
             >
-              工具箱
+              返回工具箱
+            </a>
+            <a
+              href="https://discord.gg/X556xjySDG"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="header-link px-3 py-1.5"
+              style={{
+                borderRadius: 'var(--radius-btn)',
+                backgroundColor: '#5865F2',
+                color: '#fff',
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              加入 Discord 社群
+            </a>
+            <a
+              href="https://portaly.cc/thecy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="header-link px-3 py-1.5"
+              style={{
+                borderRadius: 'var(--radius-btn)',
+                backgroundColor: 'var(--gold)',
+                color: 'var(--text-primary)',
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              支持作者
             </a>
           </div>
         </header>

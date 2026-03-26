@@ -22,9 +22,11 @@ export function SharePanel({ code }: SharePanelProps) {
 
   if (!code) return null;
 
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const shareUrl = `${baseUrl}/s/${code}`;
-  const embedUrl = `${baseUrl}/embed/${code}`;
+  const baseUrl = typeof window !== 'undefined'
+    ? window.location.origin + (window.location.pathname.replace(/\/$/, '') || '')
+    : '';
+  const shareUrl = `${baseUrl}?s=${code}`;
+  const embedUrl = `${baseUrl}?embed=${code}`;
   const embedHtml = `<iframe src="${embedUrl}" width="420" height="640" frameborder="0"></iframe>`;
 
   async function copy(text: string, label: string) {
