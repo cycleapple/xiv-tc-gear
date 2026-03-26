@@ -1,9 +1,50 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
+const SITE_URL = 'https://cycleapple.github.io/xiv-tc-gear';
+const TITLE = 'FFXIV 繁中配裝器 | FF14 配裝規劃與分享工具';
+const DESCRIPTION =
+  'FFXIV 繁體中文配裝規劃工具。支援全戰鬥職業裝備選擇、魔晶石鑲嵌、食物加成計算，以及一鍵分享配裝方案。';
+
 export const metadata: Metadata = {
-  title: 'XIV 繁中配裝',
-  description: 'FFXIV 繁體中文配裝規劃與分享工具',
+  title: {
+    default: TITLE,
+    template: '%s | XIV 繁中配裝',
+  },
+  description: DESCRIPTION,
+  keywords: [
+    'FF14', 'FFXIV', '配裝', '配裝器', 'Gear Planner', 'BiS',
+    '繁體中文', '繁中', '魔晶石', 'Materia', '食物',
+    '裝備', '副本裝', '製作裝', '零式', 'Savage',
+    'FFXIV 繁中工具箱',
+  ],
+  authors: [{ name: 'cycleapple' }],
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: '/' },
+  icons: {
+    icon: '/xiv-tc-gear/favicon.png',
+    shortcut: '/xiv-tc-gear/favicon.png',
+    apple: '/xiv-tc-gear/favicon.png',
+  },
+  openGraph: {
+    type: 'website',
+    url: SITE_URL,
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: 'FFXIV 繁中工具箱',
+    locale: 'zh_TW',
+    images: [{ url: '/xiv-tc-gear/favicon.png', width: 40, height: 40 }],
+  },
+  twitter: {
+    card: 'summary',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ['/xiv-tc-gear/favicon.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
