@@ -9,6 +9,8 @@ import { SlotSection } from '@/components/slot-section';
 import { FoodSection } from '@/components/food-section';
 import { StatsSummary } from '@/components/stats-summary';
 import { SharePanel } from '@/components/share-panel';
+import { GearCard } from '@/components/gear-card';
+import { decodeGearset, type SharedGearset } from '@/lib/sharing/codec';
 
 export default function HomePage() {
   const {
@@ -21,13 +23,22 @@ export default function HomePage() {
     encodeShareUrl, getTotalStats,
   } = useGearsetStore();
 
-  // Load shared gearset from URL query param on mount
+  // Detect share mode from URL
+  const [shareView, setShareView] = useState<SharedGearset | null>(null);
   const loadFromCode = useGearsetStore(s => s.loadFromCode);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const shareCode = params.get('s');
-    if (shareCode) {
-      loadFromCode(shareCode);
+    const code = params.get('s');
+    if (code) {
+      try {
+        const gearset = decodeGearset(code);
+        setShareView(gearset);
+        // Also load into store so data fetching works
+        loadFromCode(code);
+      } catch {
+        setShareView(null);
+      }
     }
   }, [loadFromCode]);
 
@@ -61,6 +72,57 @@ export default function HomePage() {
 
   const totalStats = useMemo(() => getTotalStats(), [slots, foodId, foodHq, items, foods]);
   const shareCode = useMemo(() => encodeShareUrl(), [job, slots, foodId, foodHq]);
+
+  // Share view mode - read-only display
+  if (shareView && job) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-3 py-2">
+        <GearCard gearset={shareView} items={items} foods={foods} materiaData={materiaData} />
+
+        {loading && (
+          <div className="text-center py-4" style={{ color: 'var(--text-muted)' }}>
+            載入裝備資料中...
+          </div>
+        )}
+
+        {!loading && (
+          <StatsSummary stats={totalStats} />
+        )}
+
+        <div className="flex justify-center gap-3 pt-2">
+          <button
+            onClick={() => {
+              setShareView(null);
+              // Clean URL
+              window.history.replaceState({}, '', window.location.pathname);
+            }}
+            className="px-4 py-2 text-sm font-medium transition-all duration-200"
+            style={{
+              borderRadius: 'var(--radius-btn)',
+              backgroundColor: 'var(--accent)',
+              color: '#fff',
+            }}
+          >
+            以此為基礎編輯
+          </button>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+            }}
+            className="px-4 py-2 text-sm font-medium transition-all duration-200"
+            style={{
+              borderRadius: 'var(--radius-btn)',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            複製分享連結
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // If no job selected, show job selector
   if (!job) {
