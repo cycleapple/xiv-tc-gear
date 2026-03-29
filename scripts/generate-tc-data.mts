@@ -1,14 +1,16 @@
 /**
- * Generate Traditional Chinese name mappings from ffxiv-datamining-tc CSV files.
+ * Generate Traditional Chinese and Simplified Chinese name mappings
+ * from ffxiv-datamining-tc and ffxiv-datamining-cn CSV files.
  * Outputs JSON files for use by the Next.js app.
  *
- * Usage: tsx scripts/generate-tc-data.mts [path-to-datamining-tc]
+ * Usage: tsx scripts/generate-tc-data.mts [path-to-datamining-tc] [path-to-datamining-cn]
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
 
 const dataminingPath = process.argv[2] || 'E:/FFXIV/XIVLauncher/ffxiv-datamining-tc';
+const dataminingCnPath = process.argv[3] || 'E:/FFXIV/XIVLauncher/ffxiv-datamining-cn';
 
 /**
  * Parse a CSV file, handling quoted fields with commas and newlines inside.
@@ -97,8 +99,19 @@ for (const row of jobRows) {
 }
 console.log(`  Found ${Object.keys(jobNames).length} jobs`);
 
-// --- Materia names (from Item.csv, materia items have specific IDs) ---
-// We'll just use the item names for materia since they're in Item.csv
+// --- CN Item names (Simplified Chinese fallback) ---
+console.log('Processing CN Item.csv...');
+const cnItemRows = parseCSV(join(dataminingCnPath, 'Item.csv'));
+const cnItemNames: Record<number, string> = {};
+let cnItemCount = 0;
+for (const row of cnItemRows) {
+  const id = parseInt(row[0]);
+  const name = row[10];
+  if (isNaN(id) || !name || name === '') continue;
+  cnItemNames[id] = name;
+  cnItemCount++;
+}
+console.log(`  Found ${cnItemCount} CN items with names`);
 
 // --- Write output ---
 const outputDir = resolve('src/lib/data');
@@ -110,6 +123,13 @@ writeFileSync(
   'utf-8'
 );
 console.log(`Written tc-items.json (${itemCount} items)`);
+
+writeFileSync(
+  join(outputDir, 'cn-items.json'),
+  JSON.stringify(cnItemNames),
+  'utf-8'
+);
+console.log(`Written cn-items.json (${cnItemCount} items)`);
 
 writeFileSync(
   join(outputDir, 'tc-jobs.json'),

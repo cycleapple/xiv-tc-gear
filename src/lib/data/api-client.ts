@@ -27,8 +27,9 @@ async function fetchApi<T>(path: string, params?: Record<string, string>): Promi
   return res.json() as Promise<T>;
 }
 
-// TC name injection
+// TC / CN name injection (fallback: TC → CN)
 let tcItemNames: Record<number, string> | null = null;
+let cnItemNames: Record<number, string> | null = null;
 
 async function getTcItemNames(): Promise<Record<number, string>> {
   if (tcItemNames) return tcItemNames;
@@ -41,33 +42,43 @@ async function getTcItemNames(): Promise<Record<number, string>> {
   return tcItemNames;
 }
 
+async function getCnItemNames(): Promise<Record<number, string>> {
+  if (cnItemNames) return cnItemNames;
+  try {
+    const mod = await import('./cn-items.json');
+    cnItemNames = mod.default as Record<number, string>;
+  } catch {
+    cnItemNames = {};
+  }
+  return cnItemNames;
+}
+
 function withTcName<T extends { primaryKey: number; tcName?: string }>(
   item: T,
-  names: Record<number, string>
+  tcNames: Record<number, string>,
+  cnNames: Record<number, string>,
 ): T & { tcName: string | undefined } {
-  return { ...item, tcName: names[item.primaryKey] };
+  return { ...item, tcName: tcNames[item.primaryKey] ?? cnNames[item.primaryKey] };
 }
 
-/** Fetch gear items for a specific job, enriched with TC names */
+/** Fetch gear items for a specific job, enriched with TC names (fallback to CN) */
 export async function fetchItems(job: string): Promise<Item[]> {
-  const [data, names] = await Promise.all([
+  const [data, tcNames, cnNames] = await Promise.all([
     fetchApi<ItemsEndpointResponse>('/Items', { job }),
     getTcItemNames(),
+    getCnItemNames(),
   ]);
-  return data.items
-    .map(item => withTcName(item, names))
-    .filter(item => item.tcName); // Only show items with TC translation
+  return data.items.map(item => withTcName(item, tcNames, cnNames));
 }
 
-/** Fetch food items, enriched with TC names */
+/** Fetch food items, enriched with TC names (fallback to CN) */
 export async function fetchFood(): Promise<Food[]> {
-  const [data, names] = await Promise.all([
+  const [data, tcNames, cnNames] = await Promise.all([
     fetchApi<FoodEndpointResponse>('/Food'),
     getTcItemNames(),
+    getCnItemNames(),
   ]);
-  return data.items
-    .map(item => withTcName(item, names))
-    .filter(item => item.tcName);
+  return data.items.map(item => withTcName(item, tcNames, cnNames));
 }
 
 /** Fetch materia data */
