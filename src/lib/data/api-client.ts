@@ -63,14 +63,25 @@ function withTcName<T extends { primaryKey: number; tcName?: string; isCnFallbac
   return { ...item, tcName: tc ?? cn, isCnFallback: !tc && !!cn };
 }
 
-/** Fetch gear items for a specific job, enriched with TC names (fallback to CN) */
+/** Local items cache */
+let cachedLocalItems: Item[] | null = null;
+
+async function getLocalItems(): Promise<Item[]> {
+  if (cachedLocalItems) return cachedLocalItems;
+  const mod = await import('./items-data.json');
+  cachedLocalItems = (mod.default as unknown as Item[]);
+  return cachedLocalItems;
+}
+
+/** Fetch gear items for a specific job, using local data + TC names */
 export async function fetchItems(job: string): Promise<Item[]> {
-  const [data, tcNames, cnNames] = await Promise.all([
-    fetchApi<ItemsEndpointResponse>('/Items', { job }),
+  const [allItems, tcNames, cnNames] = await Promise.all([
+    getLocalItems(),
     getTcItemNames(),
     getCnItemNames(),
   ]);
-  return data.items.map(item => withTcName(item, tcNames, cnNames));
+  const jobItems = allItems.filter(item => item.classJobs.includes(job));
+  return jobItems.map(item => withTcName(item, tcNames, cnNames));
 }
 
 /** Fetch food items, enriched with TC names (fallback to CN) */
