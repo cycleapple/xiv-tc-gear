@@ -84,6 +84,18 @@ export async function fetchItems(job: string): Promise<Item[]> {
   return jobItems.map(item => withTcName(item, tcNames, cnNames));
 }
 
+/** Fetch a single item by ID (any job), for shared URL lookups */
+export async function fetchItemById(itemId: number): Promise<Item | undefined> {
+  const [allItems, tcNames, cnNames] = await Promise.all([
+    getLocalItems(),
+    getTcItemNames(),
+    getCnItemNames(),
+  ]);
+  const item = allItems.find(i => i.primaryKey === itemId);
+  if (!item) return undefined;
+  return withTcName(item, tcNames, cnNames);
+}
+
 /** Fetch food items, enriched with TC names (fallback to CN) */
 export async function fetchFood(): Promise<Food[]> {
   const [data, tcNames, cnNames] = await Promise.all([

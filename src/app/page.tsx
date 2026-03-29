@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useGearsetStore } from '@/stores/gearset-store';
 import { ALL_COMBAT_JOBS, JOB_DISPLAY_NAMES, JOB_ROLES, JOB_ABBREVIATIONS_TC, JOB_ICONS, EQUIP_SLOTS, type JobName, type EquipSlotKey } from '@/lib/data/constants';
-import { fetchItems, fetchFood, fetchMateria } from '@/lib/data/api-client';
+import { fetchItems, fetchItemById, fetchFood, fetchMateria } from '@/lib/data/api-client';
 import { filterFoodByIlvl } from '@/lib/gear/filters';
 import { SlotSection } from '@/components/slot-section';
 import { FoodSection } from '@/components/food-section';
@@ -54,8 +54,22 @@ export default function HomePage() {
       fetchFood(),
       fetchMateria(),
     ])
-      .then(([itemsData, foodData, materiaRes]) => {
+      .then(async ([itemsData, foodData, materiaRes]) => {
         if (cancelled) return;
+        // Inject cross-job items from shared URL that aren't in the job-filtered list
+        const currentSlots = useGearsetStore.getState().slots;
+        const itemIds = new Set(itemsData.map(i => i.primaryKey));
+        const missingIds: number[] = [];
+        for (const slotKey of EQUIP_SLOTS) {
+          const sid = currentSlots[slotKey]?.itemId;
+          if (sid && !itemIds.has(sid)) missingIds.push(sid);
+        }
+        if (missingIds.length > 0) {
+          const extras = await Promise.all(missingIds.map(id => fetchItemById(id)));
+          for (const item of extras) {
+            if (item) itemsData.push(item);
+          }
+        }
         setItems(itemsData);
         setFoods(filterFoodByIlvl(foodData));
         setMateriaData(materiaRes.items);
