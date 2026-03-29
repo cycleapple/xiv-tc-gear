@@ -8,6 +8,7 @@ import type { MateriaAssignment } from '@/lib/gear/stats';
 import { getItemStats } from '@/lib/gear/stats';
 import { sortItems, filterByIlvl } from '@/lib/gear/filters';
 import { MateriaPanel } from './materia-panel';
+import { CnFallbackBadge } from './cn-fallback-badge';
 
 interface SlotSectionProps {
   slot: EquipSlotKey;
@@ -102,8 +103,9 @@ export function SlotSection({
             {SLOT_DISPLAY_NAMES[slot]}
           </span>
           {selectedItem && (
-            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-sm flex items-center" style={{ color: 'var(--text-muted)' }}>
               — i{selectedItem.ilvl} {selectedItem.tcName ?? selectedItem.name}
+              {selectedItem.isCnFallback && <CnFallbackBadge />}
             </span>
           )}
         </div>
@@ -180,8 +182,11 @@ export function SlotSection({
                       if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >
-                    <td className="px-2 py-1.5 truncate" style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)', maxWidth: 200 }}>
-                      {item.tcName ?? item.name}
+                    <td className="px-2 py-1.5" style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)', maxWidth: 200 }}>
+                      <span className="flex items-center truncate">
+                        {item.tcName ?? item.name}
+                        {item.isCnFallback && <CnFallbackBadge />}
+                      </span>
                     </td>
                     <td className="text-center px-1 py-1.5 font-mono" style={{ color: 'var(--text-muted)' }}>
                       {item.ilvl}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Food } from '@/lib/data/types';
 import { STAT_ABBREVIATIONS, statById } from '@/lib/data/constants';
+import { CnFallbackBadge } from './cn-fallback-badge';
 
 interface FoodSectionProps {
   foods: Food[];
@@ -67,8 +68,9 @@ export function FoodSection({ foods, selectedId, hq, onSelect }: FoodSectionProp
             HQ
           </label>
           {selected && (
-            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-sm flex items-center" style={{ color: 'var(--text-muted)' }}>
               — {selected.tcName ?? selected.name}
+              {selected.isCnFallback && <CnFallbackBadge />}
             </span>
           )}
         </div>
@@ -120,8 +122,11 @@ export function FoodSection({ foods, selectedId, hq, onSelect }: FoodSectionProp
                         if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
                       }}
                     >
-                      <td className="px-2 py-1.5 truncate" style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)', maxWidth: 200 }}>
-                        {food.tcName ?? food.name}
+                      <td className="px-2 py-1.5" style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)', maxWidth: 200 }}>
+                        <span className="flex items-center truncate">
+                          {food.tcName ?? food.name}
+                          {food.isCnFallback && <CnFallbackBadge />}
+                        </span>
                       </td>
                       <td className="px-1 py-1.5" style={{ color: 'var(--text-muted)' }}>
                         i{food.levelItem}

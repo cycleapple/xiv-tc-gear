@@ -53,12 +53,14 @@ async function getCnItemNames(): Promise<Record<number, string>> {
   return cnItemNames;
 }
 
-function withTcName<T extends { primaryKey: number; tcName?: string }>(
+function withTcName<T extends { primaryKey: number; tcName?: string; isCnFallback?: boolean }>(
   item: T,
   tcNames: Record<number, string>,
   cnNames: Record<number, string>,
-): T & { tcName: string | undefined } {
-  return { ...item, tcName: tcNames[item.primaryKey] ?? cnNames[item.primaryKey] };
+): T & { tcName: string | undefined; isCnFallback: boolean } {
+  const tc = tcNames[item.primaryKey];
+  const cn = cnNames[item.primaryKey];
+  return { ...item, tcName: tc ?? cn, isCnFallback: !tc && !!cn };
 }
 
 /** Fetch gear items for a specific job, enriched with TC names (fallback to CN) */

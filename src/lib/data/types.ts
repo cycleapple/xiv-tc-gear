@@ -77,8 +77,9 @@ export interface Item {
   baseParamMapSpecial: Record<string, number>;
   classJobs: string[];
   acquisitionSource: GearAcquisitionSource;
-  // TC name injected at runtime
+  // TC name injected at runtime (may be CN fallback)
   tcName?: string;
+  isCnFallback?: boolean;
 }
 
 export interface ItemsEndpointResponse {
@@ -100,8 +101,9 @@ export interface Food {
   bonuses: Record<string, FoodStatBonus>;
   bonusesHQ: Record<string, FoodStatBonus>;
   foodItemId: number;
-  // TC name injected at runtime
+  // TC name injected at runtime (may be CN fallback)
   tcName?: string;
+  isCnFallback?: boolean;
 }
 
 export interface FoodEndpointResponse {

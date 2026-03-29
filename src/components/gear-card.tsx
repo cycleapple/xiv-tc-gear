@@ -3,6 +3,7 @@
 import { EQUIP_SLOTS, SLOT_DISPLAY_NAMES, STAT_ABBREVIATIONS, JOB_DISPLAY_NAMES, ACQUISITION_SOURCE_NAMES, type EquipSlotKey } from '@/lib/data/constants';
 import type { Item, Food, Materia } from '@/lib/data/types';
 import type { SharedGearset, SharedMateria } from '@/lib/sharing/codec';
+import { CnFallbackBadge } from './cn-fallback-badge';
 
 const STAT_TO_PARAM: Record<string, number> = {
   tenacity: 19, dhit: 22, crit: 27,
@@ -96,8 +97,9 @@ export function GearCard({ gearset, items, foods, materiaData, compact }: GearCa
 
                 {/* Item name + materia */}
                 <td className="py-2 align-top">
-                  <div style={{ color: 'var(--text-primary)', fontSize: '0.925rem' }}>
+                  <div className="flex items-center" style={{ color: 'var(--text-primary)', fontSize: '0.925rem' }}>
                     {item.tcName ?? item.name}
+                    {item.isCnFallback && <CnFallbackBadge />}
                   </div>
                   {shared.materia.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -132,7 +134,10 @@ export function GearCard({ gearset, items, foods, materiaData, compact }: GearCa
           style={{ borderTop: '1px solid var(--border)' }}
         >
           <span className="font-medium" style={{ color: 'var(--accent)', fontSize: '0.875rem' }}>食物</span>
-          <span style={{ color: 'var(--text-primary)', fontSize: '0.925rem' }}>{food.tcName ?? food.name}</span>
+          <span className="flex items-center" style={{ color: 'var(--text-primary)', fontSize: '0.925rem' }}>
+            {food.tcName ?? food.name}
+            {food.isCnFallback && <CnFallbackBadge />}
+          </span>
           {gearset.foodHq && (
             <span style={{ color: 'var(--gold)', fontSize: '0.8rem' }}>HQ</span>
           )}
