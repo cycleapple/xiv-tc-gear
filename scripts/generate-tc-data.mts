@@ -8,6 +8,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
+import * as OpenCC from 'opencc-js';
 
 const dataminingPath = process.argv[2] || 'E:/FFXIV/XIVLauncher/ffxiv-datamining-tc';
 const dataminingCnPath = process.argv[3] || 'E:/FFXIV/XIVLauncher/ffxiv-datamining-cn';
@@ -99,8 +100,9 @@ for (const row of jobRows) {
 }
 console.log(`  Found ${Object.keys(jobNames).length} jobs`);
 
-// --- CN Item names (Simplified Chinese fallback) ---
+// --- CN Item names (Simplified Chinese → Traditional Chinese conversion) ---
 console.log('Processing CN Item.csv...');
+const s2t = OpenCC.Converter({ from: 'cn', to: 'tw' });
 const cnItemRows = parseCSV(join(dataminingCnPath, 'Item.csv'));
 const cnItemNames: Record<number, string> = {};
 let cnItemCount = 0;
@@ -108,10 +110,10 @@ for (const row of cnItemRows) {
   const id = parseInt(row[0]);
   const name = row[10];
   if (isNaN(id) || !name || name === '') continue;
-  cnItemNames[id] = name;
+  cnItemNames[id] = s2t(name);
   cnItemCount++;
 }
-console.log(`  Found ${cnItemCount} CN items with names`);
+console.log(`  Found ${cnItemCount} CN items with names (converted to Traditional)`);
 
 // --- Write output ---
 const outputDir = resolve('src/lib/data');
