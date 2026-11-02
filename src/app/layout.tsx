@@ -109,7 +109,7 @@ export default function RootLayout({
               加入 Discord 社群
             </a>
             <a
-              href="https://p.ecpay.com.tw/5630EBB"
+              href="https://portaly.cc/thecy"
               target="_blank"
               rel="noopener noreferrer"
               className="header-link px-3 py-1.5"
